@@ -16,7 +16,6 @@
       "supportsTablet": true
     },
     "android": {
-      "isTV": true,
       "package": "com.tuempresa.launchertv",
       "intentFilters": [
         {
