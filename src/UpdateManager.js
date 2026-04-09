@@ -2,28 +2,22 @@ import * as FileSystem from 'expo-file-system';
 import * as Updates from 'expo-updates';
 import Constants from 'expo-constants';
 
-// IP de tu servidor en Tailscale (Modificable según sea necesario)
-const UPDATE_SERVER_URL = 'http://127.0.0.1:3000'; 
+// URLs de GitHub (Raw) para el servidor OTA
+const REPO_URL = 'https://raw.githubusercontent.com/correo11011correo-netizen/Launcher-tv-/master';
 const BUNDLE_FILE_NAME = 'update.bundle';
-const VERSION_JSON_URL = `${UPDATE_SERVER_URL}/update.json`;
-const BUNDLE_URL = `${UPDATE_SERVER_URL}/index.android.bundle`;
+const VERSION_JSON_URL = `${REPO_URL}/update.json`;
+const BUNDLE_URL = `${REPO_URL}/android/app/src/main/assets/index.android.bundle`;
 
 export const UpdateManager = {
-  /**
-   * Obtiene la versión actual de la aplicación
-   */
   getCurrentVersion: () => {
     return Constants.expoConfig?.version || '1.0.0';
   },
 
-  /**
-   * Verifica si hay una actualización disponible en el servidor
-   */
   checkForUpdates: async () => {
     try {
-      console.log('Verificando actualizaciones en:', VERSION_JSON_URL);
+      console.log('Verificando actualizaciones en GitHub:', VERSION_JSON_URL);
       const response = await fetch(VERSION_JSON_URL, { cache: 'no-store' });
-      if (!response.ok) throw new Error('No se pudo conectar al servidor de actualizaciones');
+      if (!response.ok) throw new Error('No se pudo conectar a GitHub');
       
       const data = await response.json();
       const currentVersion = UpdateManager.getCurrentVersion();
@@ -43,13 +37,9 @@ export const UpdateManager = {
     }
   },
 
-  /**
-   * Descarga el nuevo bundle y lo guarda en la carpeta de documentos
-   */
   downloadUpdate: async (bundleUrl, onProgress) => {
     try {
       const targetPath = `${FileSystem.documentDirectory}${BUNDLE_FILE_NAME}`;
-      
       const downloadResumable = FileSystem.createDownloadResumable(
         bundleUrl,
         targetPath,
@@ -61,28 +51,18 @@ export const UpdateManager = {
       );
 
       const result = await downloadResumable.downloadAsync();
-      
-      if (result.status === 200) {
-        console.log('Descarga completada en:', result.uri);
-        return true;
-      }
-      return false;
+      return result.status === 200;
     } catch (error) {
       console.error('Error descargando actualización:', error);
       return false;
     }
   },
 
-  /**
-   * Reinicia la aplicación para aplicar el nuevo bundle
-   */
   applyUpdate: async () => {
     try {
-      // expo-updates reloadAsync reinicia el JS bridge
       await Updates.reloadAsync();
     } catch (error) {
       console.error('Error aplicando actualización:', error);
-      // Fallback: Si reloadAsync falla, el usuario deberá reiniciar manualmente
     }
   }
 };

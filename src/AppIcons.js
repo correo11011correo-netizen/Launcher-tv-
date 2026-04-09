@@ -21,3 +21,10 @@ export const AppPlaceholder = ({ size = 64, color = "#444" }) => (
     <Circle cx="32" cy="32" r="16" fill="rgba(255,255,255,0.2)" />
   </Svg>
 );
+
+export const UpdateIcon = ({ size = 24, color = "white" }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+    <Path d="M23 4v6h-6" />
+    <Path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+  </Svg>
+);
