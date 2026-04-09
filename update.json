@@ -1,5 +1,8 @@
 {
-  "version": "1.1.1",
-  "notes": "🔥 ACTUALIZACIÓN GITHUB OTA:\n- Corregido error de componente undefined.\n- Ahora el servidor es GitHub directo.\n- No necesitas Termux para actualizar.",
+  "version": "1.1.2",
+  "notes": "🔥 ACTUALIZACIÓN: ¡Market completo y logs mejorados!
+- Sistema OTA ahora apunta a GitHub.
+- Market detecta APKs y iconos por nombre.
+- Mejoras generales y logs para depuración.",
   "bundleUrl": "https://raw.githubusercontent.com/correo11011correo-netizen/Launcher-tv-/master/android/app/src/main/assets/index.android.bundle"
 }
