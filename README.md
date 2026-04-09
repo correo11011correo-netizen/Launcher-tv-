@@ -1,62 +1,58 @@
-# Launcher TV (Android TV)
+# Launcher TV (Android TV) - Plataforma de Gestión Centralizada
 
-Launcher personalizado desarrollado con React Native y Expo, diseñado específicamente para dispositivos de TV con un sistema de gestión de aplicaciones controlado remotamente.
+Este proyecto es un Launcher optimizado para TV que integra un sistema de actualizaciones Over-The-Air (OTA) y una Tienda de Aplicaciones (Market) privada, todo gestionado a través de GitHub.
 
-## 🎯 Objetivos del Proyecto
+## 🚀 Funcionalidades Clave
 
-*   **Interfaz Optimizada:** UI pensada para navegación con D-Pad (control remoto).
-*   **Catálogo Curado:** El launcher solo muestra aplicaciones específicas predefinidas o cargadas vía remota. No es un "listador" de todas las apps del sistema por defecto.
-*   **Tienda Privada:** Sistema propio de carga de APKs (estilo Play Store interna) para instalar apps autorizadas desde un servidor central.
-*   **Modo Autónomo:** Funcionamiento sin dependencia del servidor Metro (JS Bundle embebido).
+1.  **Actualizaciones OTA vía GitHub:** El launcher busca automáticamente nuevas versiones del código JavaScript en el repositorio. Si existe una actualización, permite descargarla y aplicarla sin reinstalar el APK.
+2.  **Market de Aplicaciones Interno:** Una pestaña dedicada para instalar aplicaciones (APKs) seleccionadas. El launcher gestiona la descarga y lanza el instalador nativo de Android.
+3.  **Interfaz de Usuario TV:** Navegación optimizada para control remoto (D-Pad) con sistema de pestañas (Mis Apps, Market, Ajustes).
+4.  **Funcionamiento Offline/Standalone:** El APK incluye un bundle base que funciona sin internet; la red solo es necesaria para actualizaciones o descargas del Market.
 
-## 🛠️ Tecnologías y Compilación
+## 🛠️ Arquitectura Técnica
 
-*   **Framework:** React Native 0.81.5 / Expo SDK 54.
-*   **Plataforma principal:** Android TV.
-*   **Sistema de Build:** Gradle (Android Nativo).
-*   **Estrategia de Bundle:** JavaScript embebido en los assets nativos para evitar el uso de servidores de desarrollo en producción.
+### Sistema OTA (Actualización de Código)
+*   **Lado Nativo:** `MainApplication.kt` sobreescribe `getJSBundleFile()` para buscar `update.bundle` en la carpeta interna de la app (`files/`).
+*   **Lado JS:** `UpdateManager.js` consulta `update.json` en GitHub para comparar versiones y descargar el nuevo bundle.
 
-## 🚀 Comandos de Desarrollo
+### Sistema de Market (Instalación de Apps)
+*   **Catálogo:** Gestionado en `market/apps.json`.
+*   **Instalación:** Usa `expo-file-system` para descargar el APK y `expo-intent-launcher` para ejecutar la acción `INSTALL_PACKAGE` de Android.
 
-### 1. Iniciar servidor de desarrollo (Metro)
-```bash
-npm start
+## 📡 Guía para el Administrador (Gestión vía GitHub)
+
+Para actualizar el launcher o añadir apps al market, solo necesitas modificar los archivos en este repositorio:
+
+### A. Subir una actualización del Launcher (OTA)
+1.  Genera el nuevo bundle: `npx expo export:embed --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/`
+2.  Sube el archivo generado al repositorio.
+3.  Incrementa la versión en `update.json` y añade las novedades en `notes`.
+
+### B. Añadir una App al Market
+1.  Sube el archivo `.apk` a la carpeta `market/`.
+2.  Añade la entrada correspondiente en `market/apps.json`:
+```json
+{
+  "id": "unique-id",
+  "name": "Nombre de la App",
+  "version": "1.0.0",
+  "description": "Descripción corta",
+  "icon": "URL_A_ICONO_PNG",
+  "apkUrl": "URL_RAW_AL_ARCHIVO_APK"
+}
 ```
 
-### 2. Generar el Bundle de JS para Android (Modo Offline)
-Este comando empaqueta todo el código JS dentro de la carpeta de assets de Android para que la app no necesite el servidor Metro para arrancar.
+## 📦 Comandos de Compilación y Despliegue
+
+### Compilar el APK Base
 ```bash
-npx expo export:embed --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
-```
-
-### 3. Compilar el APK (Debug)
-Una vez generado el bundle, puedes crear el instalador:
-```bash
-cd android
-./gradlew assembleDebug
-```
-El APK se encontrará en: `android/app/build/outputs/apk/debug/app-debug.apk`
-
-## 🚀 Despliegue Local (Tailscale)
-
-Para enviar el APK generado a un dispositivo en la red de Tailscale (por ejemplo, la TV o un PC de pruebas):
-
-```bash
-# 1. Asegurar el bundle JS actualizado
-npx expo export:embed --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/
-
-# 2. Compilar APK
 cd android && ./gradlew assembleDebug
+```
 
-# 3. Enviar vía Tailscale (ejemplo IP 100.81.8.76)
+### Enviar a Dispositivo (Tailscale)
+```bash
 sudo tailscale file cp android/app/build/outputs/apk/debug/app-debug.apk 100.81.8.76:
 ```
 
-## 📡 Arquitectura de Carga Remota (Roadmap)
-
-1.  **API Rest:** El launcher consultará un endpoint para obtener el listado de apps permitidas.
-2.  **Módulo Nativo:** Se integrará lógica para consultar las aplicaciones instaladas y filtrar la vista principal.
-3.  **Gestor de Descargas:** Implementación de descarga de APKs y prompts de instalación para las apps que falten en el catálogo local.
-
 ---
-*Nota: Este proyecto utiliza el flujo de trabajo "Prebuild" de Expo, lo que permite modificar código nativo en la carpeta `/android` manteniendo las ventajas de Expo.*
+*Desarrollado con React Native, Expo y Kotlin para una experiencia nativa fluida en Android TV.*
