@@ -28,3 +28,11 @@ export const UpdateIcon = ({ size = 24, color = "white" }) => (
     <Path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
   </Svg>
 );
+
+export const MarketIcon = ({ size = 24, color = "white" }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2">
+    <Path d="M3 3h18v18H3z" />
+    <Path d="M3 9h18" />
+    <Path d="M9 21V9" />
+  </Svg>
+);
